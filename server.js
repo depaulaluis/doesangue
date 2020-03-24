@@ -75,7 +75,7 @@ server.post("/", function(req, res){
 
   db.query(query,values, function(err){
     //fluxo de erro
-    if (err) return res.send("erro no banco de dados.")
+    if (err) return res.send("Error in the database!")
       return res.redirect("/")
   })
 
