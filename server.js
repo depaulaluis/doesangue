@@ -1,5 +1,6 @@
 //configurando o servidor
-const express = require("express") 
+const express = require("express")
+
 const server = express()
 
 //configurando o servidor para apresentar os arquivos estaticos
@@ -14,47 +15,26 @@ const db = new Pool({
   user:'postgres',
   password:'123456',
   host: 'localhost',
-  port: '5233',
+  port: '5433',
   database: 'doe'
-})
+});
 
 //configurando a template engie
 const nunjucks = require("nunjucks")
 nunjucks.configure("./", {
   express: server,
   noCache: true
-})
-
-
-//lista de doadores array
-const donors = [
-  {
-    name: "Luis Henrique",
-    blood: "AB+"
-  },
-  {
-    name: "Letícia Ijorski",
-    blood: "A-"
-  },
-  {
-    name: "Lucas Alves",
-    blood: "B+"
-  },
-  {
-    name: "Vinicius de Paula",
-    blood: "O+"
-  },
-]
-
-
-
+});
 
 //configurar a apresentação da pagina
-server.get("/", function(req, res){
-  const donors = []
-  return res.render("index.html", {donors})
-})
+server.get("/", function(req, res) {
+  db.query("SELECT * FROM donors", function(err, result) {
+      if (err) return res.send("Oops! ocorreu um erro no banco de dados!");
+      const donors = result.rows;
+      res.render('index.html', { donors });
+  })
 
+});
 
 server.post("/", function(req, res){
   //pegar dados do formulario
@@ -71,7 +51,7 @@ server.post("/", function(req, res){
     INSERT INTO donors ("name","email","blood") 
     VALUES ($1, $2, $3)
    `
-  const values = [nome, email, blood]
+  const values = [name, email, blood]
 
   db.query(query,values, function(err){
     //fluxo de erro
